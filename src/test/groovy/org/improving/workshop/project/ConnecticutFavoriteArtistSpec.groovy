@@ -8,11 +8,9 @@ import org.apache.kafka.streams.TopologyTestDriver
 import org.improving.workshop.Streams
 import org.msse.demo.mockdata.customer.address.Address
 import org.msse.demo.mockdata.customer.profile.Customer
-import org.msse.demo.mockdata.music.artist.Artist
 import org.msse.demo.mockdata.music.stream.Stream
 import spock.lang.Specification
 
-import static org.improving.workshop.utils.DataFaker.ARTISTS
 import static org.improving.workshop.utils.DataFaker.STREAMS
 
 class ConnecticutFavoriteArtistSpec extends Specification {
@@ -22,7 +20,6 @@ class ConnecticutFavoriteArtistSpec extends Specification {
   TestInputTopic<String, Stream> streamInputTopic
   TestInputTopic<String, Address> addressInputTopic
   TestInputTopic<String, Customer> customerInputTopic
-  TestInputTopic<String, Artist> artistInputTopic
 
   // outputs
   TestOutputTopic<String, ConnecticutFavoriteArtist.ArtistStreams> outputTopic
@@ -34,11 +31,6 @@ class ConnecticutFavoriteArtistSpec extends Specification {
 
     driver = new TopologyTestDriver(streamsBuilder.build(), Streams.buildProperties())
 
-    artistInputTopic = driver.createInputTopic(
-      Streams.TOPIC_DATA_DEMO_ARTISTS,
-      Serdes.String().serializer(),
-      Streams.SERDE_ARTIST_JSON.serializer()
-    )
     addressInputTopic = driver.createInputTopic(
       Streams.TOPIC_DATA_DEMO_ADDRESSES,
       Serdes.String().serializer(),
@@ -68,9 +60,8 @@ class ConnecticutFavoriteArtistSpec extends Specification {
 
   // Test to ensure simply that events are correctly flowing
   def "it returns the expected artist when there is only 1 artist and only 1 customer in CT streaming"() {
-    given: 'an artist'
+    given: 'an artist id'
     String favoriteArtistId = "ct-favorite"
-    artistInputTopic.pipeInput(favoriteArtistId, ARTISTS.generate(favoriteArtistId))
 
     and: 'A customer with the CT address'
     String customerId = 'ct-customer'
@@ -108,8 +99,7 @@ class ConnecticutFavoriteArtistSpec extends Specification {
     streamInputTopic.pipeInput(STREAMS.generate(customerId, favoriteArtistId))
     streamInputTopic.pipeInput(STREAMS.generate(customerId, favoriteArtistId))
     streamInputTopic.pipeInput(STREAMS.generate(customerId, favoriteArtistId))
-//
-//
+
     when: 'reading the output records'
     def outputRecords = outputTopic.readRecordsToList()
 
@@ -125,8 +115,6 @@ class ConnecticutFavoriteArtistSpec extends Specification {
     given: '2 artists'
     String favoriteArtistId = 'ct-artist'
     String otherArtistId = 'other-artist'
-    artistInputTopic.pipeInput(favoriteArtistId, ARTISTS.generate(favoriteArtistId))
-    artistInputTopic.pipeInput(otherArtistId, ARTISTS.generate(otherArtistId))
 
     and: 'a CT customer'
     String ctCustomerId = 'ct-customer'
@@ -210,8 +198,6 @@ class ConnecticutFavoriteArtistSpec extends Specification {
     given: '2 artists'
     String favoriteArtistId = 'ct-artist'
     String otherArtistId = 'other-artist'
-    artistInputTopic.pipeInput(favoriteArtistId, ARTISTS.generate(favoriteArtistId))
-    artistInputTopic.pipeInput(otherArtistId, ARTISTS.generate(otherArtistId))
 
     and: '1 CT customer'
     String ctCustomerId = 'ct-customer'
@@ -273,8 +259,6 @@ class ConnecticutFavoriteArtistSpec extends Specification {
     given: '2 artists'
     String finalFavoriteArtistId = 'ct-final-favorite-artist'
     String initialFavoriteArtistId = 'ct-initial-favorite-artist'
-    artistInputTopic.pipeInput(finalFavoriteArtistId, ARTISTS.generate(finalFavoriteArtistId))
-    artistInputTopic.pipeInput(initialFavoriteArtistId, ARTISTS.generate(initialFavoriteArtistId))
 
     and: '1 CT customer'
     String ctCustomerId = 'ct-customer'

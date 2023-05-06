@@ -9,7 +9,6 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.*;
 import org.msse.demo.mockdata.customer.address.Address;
 import org.msse.demo.mockdata.customer.profile.Customer;
-import org.msse.demo.mockdata.music.artist.Artist;
 import org.msse.demo.mockdata.music.stream.Stream;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
@@ -26,14 +25,6 @@ public class ConnecticutFavoriteArtist {
     public static final JsonSerde<ArtistStreamsWithIsNewMaxFlag> ARTIST_STREAMS_IS_NEW_MAX_JSON_SERDE = new JsonSerde<>(ArtistStreamsWithIsNewMaxFlag.class);
 
     static void configureTopology(final StreamsBuilder builder) {
-        KTable<String, Artist> artistsTable = builder
-                .table(
-                        TOPIC_DATA_DEMO_ARTISTS,
-                        Materialized
-                                .<String, Artist>as(persistentKeyValueStore("artists"))
-                                .withKeySerde(Serdes.String())
-                                .withValueSerde(SERDE_ARTIST_JSON)
-                );
         KTable<String, Customer> customersTable = builder
                 .table(
                         TOPIC_DATA_DEMO_CUSTOMERS,
